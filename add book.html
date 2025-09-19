@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarenChebet Library - Books Management</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    :root {
+      --primary: #dc3545;
+      --primary-light: #f8d7da;
+      --secondary: #6c757d;
+      --light: #f8f9fa;
+      --dark: #343a40;
+      --success: #28a745;
+      --border-radius: 8px;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 250px;
+      background: var(--dark);
+      color: white;
+      padding: 20px 0;
+      transition: var(--transition);
+      box-shadow: var(--shadow);
+      z-index: 1000;
+    }
+    
+    .sidebar-header {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 20px;
+    }
+    
+    .sidebar-header h2 {
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .sidebar-header h2 i {
+      color: var(--primary);
+    }
+    
+    .nav-links {
+      list-style: none;
+    }
+    
+    .nav-links li {
+      margin-bottom: 5px;
+    }
+    
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: #ddd;
+      padding: 12px 20px;
+      text-decoration: none;
+      transition: var(--transition);
+      font-weight: 500;
+    }
+    
+    .nav-links a:hover, .nav-links a.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-left: 4px solid var(--primary);
+    }
+    
+    .nav-links a i {
+      width: 20px;
+      text-align: center;
+    }
+    
+    .nav-links .logout {
+      margin-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 20px;
+    }
+    
+    .nav-links .logout a {
+      color: var(--primary-light);
+    }
+    
+    .nav-links .logout a:hover {
+      color: white;
+    }
+    
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .page-header h1 {
+      font-size: 1.8rem;
+      color: var(--dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    /* Form Styling */
+    .form-card {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 25px;
+      margin-bottom: 30px;
+    }
+    
+    .form-card h3 {
+      color: var(--dark);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .form-card h3 i {
+      color: var(--primary);
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 8px;
+    }
+    
+    .form-control {
+      border-radius: var(--border-radius);
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      transition: var(--transition);
+    }
+    
+    .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+    
+    .btn-primary {
+      background-color: var(--primary);
+      border-color: var(--primary);
+      padding: 10px 20px;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      transition: var(--transition);
+    }
+    
+    .btn-primary:hover {
+      background-color: #c82333;
+      border-color: #bd2130;
+      transform: translateY(-2px);
+    }
+    
+    /* Table Styling */
+    .table-card {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 25px;
+      overflow: hidden;
+    }
+    
+    .table-card h3 {
+      color: var(--dark);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .table-card h3 i {
+      color: var(--primary);
+    }
+    
+    .table {
+      border-collapse: separate;
+      border-spacing: 0;
+      width: 100%;
+    }
+    
+    .table thead th {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 15px;
+      font-weight: 600;
+    }
+    
+    .table tbody td {
+      padding: 15px;
+      vertical-align: middle;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .table tbody tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .table tbody tr:hover {
+      background-color: #f8f9fa;
+    }
+    
+    .status-available {
+      color: var(--success);
+      font-weight: 600;
+    }
+    
+    .status-out {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    
+    .btn-danger {
+      padding: 6px 12px;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      transition: var(--transition);
+    }
+    
+    .btn-danger:hover {
+      transform: translateY(-2px);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 992px) {
+      body {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+        padding: 10px 0;
+      }
+      
+      .nav-links {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 10px;
+      }
+      
+      .nav-links li {
+        margin-bottom: 0;
+        flex-shrink: 0;
+      }
+      
+      .nav-links a {
+        padding: 10px 15px;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+      }
+      
+      .nav-links a:hover, .nav-links a.active {
+        border-left: none;
+        border-bottom: 3px solid var(--primary);
+      }
+      
+      .nav-links .logout {
+        margin-top: 0;
+        border-top: none;
+        padding-top: 0;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .table-responsive {
+        overflow-x: auto;
+      }
+      
+      .table thead {
+        display: none;
+      }
+      
+      .table tbody tr {
+        display: block;
+        margin-bottom: 15px;
+        border: 1px solid #eee;
+        border-radius: var(--border-radius);
+      }
+      
+      .table tbody td {
+        display: block;
+        text-align: right;
+        padding: 10px 15px;
+        position: relative;
+        border-bottom: 1px solid #eee;
+      }
+      
+      .table tbody td:last-child {
+        border-bottom: none;
+      }
+      
+      .table tbody td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 15px;
+        font-weight: 600;
+        color: var(--dark);
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2><i class="fas fa-book"></i> CarenChebet Library</h2>
+    </div>
+    <ul class="nav-links">
+      <li><a href="public.html"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="lib register.html"><i class="fas fa-users"></i> Manage Members</a></li>
+      <li><a href="books.html" class="active"><i class="fas fa-book-open"></i> Manage Books</a></li>
+      <li><a href="issues.html"><i class="fas fa-exchange-alt"></i> Issues</a></li>
+      <li><a href="lib report.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+      <li class="logout"><a href="auth.html"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1><i class="fas fa-book"></i> Manage Books</h1>
+    </div>
+
+    <!-- Add Book Form -->
+    <div class="form-card">
+      <h3><i class="fas fa-plus-circle"></i> Add a New Book</h3>
+      <form id="bookForm">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="title">Book Title</label>
+              <input type="text" id="title" class="form-control" required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="author">Author</label>
+              <input type="text" id="author" class="form-control" required>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="year">Year</label>
+              <input type="number" id="year" class="form-control" required>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="copies">Number of Copies</label>
+              <input type="number" id="copies" class="form-control" required min="1" value="1">
+            </div>
+          </div>
+          <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary btn-block">
+              <i class="fas fa-plus"></i> Add Book
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Books Table -->
+    <div class="table-card">
+      <h3><i class="fas fa-book-open"></i> Library Books</h3>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Year</th>
+              <th>Total Copies</th>
+              <th>Available</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="booksList">
+            <tr>
+              <td colspan="7" class="text-center">Loading books...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Firebase + Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } 
+      from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyAKMv1RIemwkvnBeIL7CriWiL0VprPipoI",
+      authDomain: "smart-f77b6.firebaseapp.com",
+      projectId: "smart-f77b6",
+      storageBucket: "smart-f77b6.appspot.com",
+      messagingSenderId: "210530046379",
+      appId: "1:210530046379:web:b2ecca8adc946581f842ee",
+      measurementId: "G-Y42CQGSQ5S"
+    };
+
+    // Init Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const booksCol = collection(db, "books");
+
+    // Add Book
+    const bookForm = document.getElementById("bookForm");
+    bookForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const title = document.getElementById("title").value;
+      const author = document.getElementById("author").value;
+      const year = document.getElementById("year").value;
+      const copies = parseInt(document.getElementById("copies").value);
+
+      await addDoc(booksCol, { 
+        title, 
+        author, 
+        year, 
+        totalCopies: copies,
+        availableCopies: copies,
+        status: "Available"
+      });
+
+      bookForm.reset();
+      loadBooks();
+    });
+
+    // Load Books
+    async function loadBooks() {
+      const snapshot = await getDocs(booksCol);
+      const booksList = document.getElementById("booksList");
+      booksList.innerHTML = "";
+      
+      if (snapshot.empty) {
+        booksList.innerHTML = `
+          <tr>
+            <td colspan="7" class="text-center">No books found. Add your first book!</td>
+          </tr>
+        `;
+        return;
+      }
+      
+      snapshot.forEach((docSnap) => {
+        const book = docSnap.data();
+        const status = book.availableCopies > 0 ? 
+          '<span class="status-available">Available</span>' : 
+          '<span class="status-out">Out of Stock</span>';
+        
+        const row = `
+          <tr>
+            <td data-label="Title">${book.title}</td>
+            <td data-label="Author">${book.author}</td>
+            <td data-label="Year">${book.year}</td>
+            <td data-label="Total Copies">${book.totalCopies}</td>
+            <td data-label="Available">${book.availableCopies}</td>
+            <td data-label="Status">${status}</td>
+            <td data-label="Action">
+              <button class="btn btn-danger btn-sm" onclick="deleteBook('${docSnap.id}')">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </td>
+          </tr>
+        `;
+        booksList.innerHTML += row;
+      });
+    }
+
+    // Delete Book
+    window.deleteBook = async (id) => {
+      if (confirm("Are you sure you want to delete this book?")) {
+        await deleteDoc(doc(db, "books", id));
+        loadBooks();
+      }
+    };
+
+    // Load books on start
+    loadBooks();
+  </script>
+
+</body>
+</html>

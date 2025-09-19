@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarenChebet Library - Issue & Return</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4e73df;
+      --secondary: #6c757d;
+      --success: #1cc88a;
+      --info: #36b9cc;
+      --warning: #f6c23e;
+      --danger: #e74a3b;
+      --light: #f8f9fc;
+      --dark: #5a5c69;
+    }
+    
+    body {
+      background-color: #f8f9fc;
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    .navbar-brand {
+      font-weight: 800;
+      font-size: 1.65rem;
+    }
+    
+    .card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+      margin-bottom: 1.5rem;
+    }
+    
+    .card-header {
+      background-color: #f8f9fc;
+      border-bottom: 1px solid #e3e6f0;
+      padding: 1rem 1.35rem;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    
+    .table th {
+      border-top: none;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      color: var(--dark);
+    }
+    
+    .btn {
+      border-radius: 0.35rem;
+      font-weight: 600;
+    }
+    
+    .form-control {
+      border-radius: 0.35rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid #d1d3e2;
+    }
+    
+    .form-control:focus {
+      border-color: #bac8f3;
+      box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+    }
+    
+    .loader {
+      display: inline-block;
+      width: 1.5rem;
+      height: 1.5rem;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .badge-penalty {
+      background-color: #f8e3da;
+      color: #e74a3b;
+      font-weight: 700;
+    }
+    
+    .badge-returned {
+      background-color: #e0f7f0;
+      color: #1cc88a;
+      font-weight: 700;
+    }
+    
+    .empty-state {
+      padding: 3rem 1rem;
+      text-align: center;
+      color: #b7b9cc;
+    }
+    
+    .empty-state i {
+      font-size: 5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .toast {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 9999;
+      box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    }
+    
+    @media (max-width: 768px) {
+      .table-responsive-custom {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      
+      .card-header {
+        padding: 0.75rem 1rem;
+      }
+      
+      .btn-sm-block {
+        display: block;
+        width: 100%;
+        margin-bottom: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body class="bg-light">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <a class="navbar-brand" href="index.html"><i class="fas fa-book-reader me-2"></i>CarenChebet Library</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item"><a class="nav-link" href="books.html"><i class="fas fa-book me-1"></i> Books</a></li>
+        <li class="nav-item"><a class="nav-link" href="register.html"><i class="fas fa-users me-1"></i> Members</a></li>
+        <li class="nav-item active"><a class="nav-link" href="issues.html"><i class="fas fa-exchange-alt me-1"></i> Issue & Return</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container mt-5">
+    <h2 class="text-center mb-4 text-gray-800"><i class="fas fa-exchange-alt me-2"></i>Issue & Return Books</h2>
+
+    <!-- Toast Notifications -->
+    <div id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+    <!-- Issue Book Form -->
+    <div class="card p-4 shadow-sm mb-5">
+      <div class="card-header bg-transparent px-0 pt-0">
+        <h5 class="mb-0"><i class="fas fa-book me-2 text-primary"></i>Issue a Book</h5>
+      </div>
+      <form id="issueForm">
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="bookSelect">Select Book</label>
+            <select id="bookSelect" class="form-control" required>
+              <option value="">Loading books...</option>
+            </select>
+            <div class="invalid-feedback">Please select a book</div>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="memberSelect">Select Member</label>
+            <select id="memberSelect" class="form-control" required>
+              <option value="">Loading members...</option>
+            </select>
+            <div class="invalid-feedback">Please select a member</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group col-md-6">
+            <label for="memberEmail">Student Email</label>
+            <input type="email" id="memberEmail" class="form-control" placeholder="Enter student email" required>
+            <div class="invalid-feedback">Please provide a valid email</div>
+          </div>
+          <div class="form-group col-md-6">
+            <label for="returnDate">Return Date</label>
+            <input type="date" id="returnDate" class="form-control" required>
+            <div class="invalid-feedback">Please select a return date</div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-success btn-block py-2">
+          <span id="issueButtonText"><i class="fas fa-check-circle me-1"></i> Issue Book</span>
+          <span id="issueButtonSpinner" class="d-none"><span class="loader me-2"></span> Processing...</span>
+        </button>
+      </form>
+    </div>
+
+    <!-- Issued Books -->
+    <div class="card p-4 shadow-sm">
+      <div class="card-header bg-transparent px-0 pt-0 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="fas fa-clipboard-list me-2 text-primary"></i>Issued Books</h5>
+        <button class="btn btn-sm btn-primary" id="refreshIssues">
+          <i class="fas fa-sync-alt"></i>
+        </button>
+      </div>
+      <div class="table-responsive-custom">
+        <table class="table table-bordered table-hover mt-3">
+          <thead class="thead-light">
+            <tr>
+              <th>Book</th>
+              <th>Member</th>
+              <th>Email</th>
+              <th>Issue Date</th>
+              <th>Return Date</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="issuesList">
+            <tr>
+              <td colspan="7">
+                <div class="empty-state">
+                  <i class="fas fa-inbox"></i>
+                  <p class="mt-3">No books issued yet</p>
+                  <p class="text-muted">Issue a book to get started</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Return Confirmation Modal -->
+  <div class="modal fade" id="returnModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirm Return</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to mark this book as returned?</p>
+          <div id="returnDetails" class="bg-light p-3 rounded"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" id="confirmReturn">Confirm Return</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap & jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+  <!-- Firebase + Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-app.js";
+    import { 
+      getFirestore, collection, addDoc, getDocs, updateDoc, doc, deleteDoc, onSnapshot 
+    } from "https://www.gstatic.com/firebasejs/10.12.3/firebase-firestore.js";
+
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyAKMv1RIemwkvnBeIL7CriWiL0VprPipoI",
+      authDomain: "smart-f77b6.firebaseapp.com",
+      projectId: "smart-f77b6",
+      storageBucket: "smart-f77b6.appspot.com",
+      messagingSenderId: "210530046379",
+      appId: "1:210530046379:web:b2ecca8adc946581f842ee",
+      measurementId: "G-Y42CQGSQ5S"
+    };
+
+    // Init Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const booksCol = collection(db, "books");
+    const membersCol = collection(db, "members");
+    const issuesCol = collection(db, "issues");
+
+    const bookSelect = document.getElementById("bookSelect");
+    const memberSelect = document.getElementById("memberSelect");
+    const memberEmail = document.getElementById("memberEmail");
+    const returnDate = document.getElementById("returnDate");
+    const issuesList = document.getElementById("issuesList");
+    const issueForm = document.getElementById("issueForm");
+    const refreshIssues = document.getElementById("refreshIssues");
+    const issueButtonText = document.getElementById("issueButtonText");
+    const issueButtonSpinner = document.getElementById("issueButtonSpinner");
+
+    // Set minimum return date to today
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate() + 1).padStart(2, '0');
+    returnDate.min = `${yyyy}-${mm}-${dd}`;
+
+    // Show toast notification
+    function showToast(message, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `toast align-items-center text-white bg-${type} border-0`;
+      toast.setAttribute('role', 'alert');
+      toast.setAttribute('aria-live', 'assertive');
+      toast.setAttribute('aria-atomic', 'true');
+      toast.innerHTML = `
+        <div class="d-flex">
+          <div class="toast-body">
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'danger' ? 'fa-exclamation-circle' : 'fa-info-circle'} me-2"></i>
+            ${message}
+          </div>
+          <button type="button" class="mr-2 mb-1 close text-white" data-dismiss="toast" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+      `;
+      
+      document.getElementById('toastContainer').appendChild(toast);
+      $(toast).toast({ delay: 3000 });
+      $(toast).toast('show');
+      
+      // Remove toast after it's hidden
+      toast.addEventListener('hidden.bs.toast', function() {
+        toast.remove();
+      });
+    }
+
+    // Format date to readable format
+    function formatDate(dateString) {
+      if (!dateString) return 'N/A';
+      
+      const options = { year: 'numeric', month: 'short', day: 'numeric' };
+      const date = new Date(dateString);
+      
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        return dateString; // Return original if invalid
+      }
+      
+      return date.toLocaleDateString('en-US', options);
+    }
+
+    // Calculate penalty
+    function calculatePenalty(returnDateString) {
+      if (!returnDateString) return { days: 0, amount: 0 };
+      
+      const returnDate = new Date(returnDateString);
+      const today = new Date();
+      
+      // Reset time part for accurate day difference calculation
+      returnDate.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+      
+      const diffTime = today - returnDate;
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays <= 0) return { days: 0, amount: 0 };
+      
+      return { days: diffDays, amount: diffDays * 20 };
+    }
+
+    // Load books into dropdown
+    async function loadBooksDropdown() {
+      try {
+        bookSelect.innerHTML = '<option value="">Loading books...</option>';
+        const snapshot = await getDocs(booksCol);
+        
+        bookSelect.innerHTML = '<option value="">Select a book</option>';
+        snapshot.forEach((docSnap) => {
+          const book = docSnap.data();
+          if (book.availableCopies > 0) {
+            let option = document.createElement("option");
+            option.value = docSnap.id;
+            option.textContent = `${book.title} by ${book.author || 'Unknown'} (${book.availableCopies} available)`;
+            bookSelect.appendChild(option);
+          }
+        });
+        
+        if (bookSelect.options.length === 1) {
+          bookSelect.innerHTML = '<option value="">No available books</option>';
+        }
+      } catch (error) {
+        console.error("Error loading books: ", error);
+        showToast("Error loading books", "danger");
+        bookSelect.innerHTML = '<option value="">Error loading books</option>';
+      }
+    }
+
+    // Load members into dropdown
+    async function loadMembersDropdown() {
+      try {
+        memberSelect.innerHTML = '<option value="">Loading members...</option>';
+        const snapshot = await getDocs(membersCol);
+        
+        memberSelect.innerHTML = '<option value="">Select a member</option>';
+        snapshot.forEach((docSnap) => {
+          const member = docSnap.data();
+          let option = document.createElement("option");
+          option.value = docSnap.id;
+          option.textContent = `${member.name} (${member.category})`;
+          option.setAttribute("data-email", member.email || "");
+          memberSelect.appendChild(option);
+        });
+        
+        if (memberSelect.options.length === 1) {
+          memberSelect.innerHTML = '<option value="">No members found</option>';
+        }
+      } catch (error) {
+        console.error("Error loading members: ", error);
+        showToast("Error loading members", "danger");
+        memberSelect.innerHTML = '<option value="">Error loading members</option>';
+      }
+
+      // Auto-fill email when member is selected
+      memberSelect.addEventListener("change", () => {
+        const selectedOption = memberSelect.options[memberSelect.selectedIndex];
+        memberEmail.value = selectedOption.getAttribute("data-email") || "";
+      });
+    }
+
+    // Validate form
+    function validateForm() {
+      let isValid = true;
+      
+      // Reset validation states
+      issueForm.classList.remove('was-validated');
+      const inputs = issueForm.querySelectorAll('.form-control');
+      inputs.forEach(input => {
+        input.classList.remove('is-invalid');
+      });
+      
+      // Check each required field
+      if (!bookSelect.value) {
+        bookSelect.classList.add('is-invalid');
+        isValid = false;
+      }
+      
+      if (!memberSelect.value) {
+        memberSelect.classList.add('is-invalid');
+        isValid = false;
+      }
+      
+      if (!memberEmail.value || !memberEmail.checkValidity()) {
+        memberEmail.classList.add('is-invalid');
+        isValid = false;
+      }
+      
+      if (!returnDate.value) {
+        returnDate.classList.add('is-invalid');
+        isValid = false;
+      }
+      
+      if (!isValid) {
+        issueForm.classList.add('was-validated');
+        showToast("Please fill all required fields correctly", "danger");
+      }
+      
+      return isValid;
+    }
+
+    // Issue book
+    issueForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      if (!validateForm()) return;
+      
+      const bookId = bookSelect.value;
+      const memberId = memberSelect.value;
+      const email = memberEmail.value;
+      const issueDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+      const returnDateValue = returnDate.value;
+
+      try {
+        // Show loading state
+        issueButtonText.classList.add('d-none');
+        issueButtonSpinner.classList.remove('d-none');
+        
+        // Fetch book & member
+        let bookData, memberData;
+        const booksSnap = await getDocs(booksCol);
+        booksSnap.forEach((docSnap) => { if (docSnap.id === bookId) bookData = docSnap.data(); });
+        
+        const membersSnap = await getDocs(membersCol);
+        membersSnap.forEach((docSnap) => { if (docSnap.id === memberId) memberData = docSnap.data(); });
+
+        // Check if book is still available
+        if (bookData.availableCopies < 1) {
+          showToast("This book is no longer available", "danger");
+          loadBooksDropdown();
+          return;
+        }
+
+        // Save issue with email
+        await addDoc(issuesCol, { 
+          bookId, 
+          bookTitle: bookData.title, 
+          memberId, 
+          memberName: memberData.name, 
+          memberEmail: email,
+          issueDate, 
+          returnDate: returnDateValue,
+          returned: false
+        });
+
+        // Update available copies
+        await updateDoc(doc(db, "books", bookId), { 
+          availableCopies: bookData.availableCopies - 1 
+        });
+
+        // Reset form
+        issueForm.reset();
+        issueForm.classList.remove('was-validated');
+        
+        showToast("Book issued successfully!", "success");
+        
+        // Refresh data
+        loadBooksDropdown();
+        loadIssues();
+        
+      } catch (error) {
+        console.error("Error issuing book: ", error);
+        showToast("Error issuing book", "danger");
+      } finally {
+        // Hide loading state
+        issueButtonText.classList.remove('d-none');
+        issueButtonSpinner.classList.add('d-none');
+      }
+    });
+
+    // Load issued books
+    async function loadIssues() {
+      try {
+        const snapshot = await getDocs(issuesCol);
+        
+        if (snapshot.empty) {
+          issuesList.innerHTML = `
+            <tr>
+              <td colspan="7">
+                <div class="empty-state">
+                  <i class="fas fa-inbox"></i>
+                  <p class="mt-3">No books issued yet</p>
+                  <p class="text-muted">Issue a book to get started</p>
+                </div>
+              </td>
+            </tr>
+          `;
+          return;
+        }
+        
+        issuesList.innerHTML = '';
+        snapshot.forEach((docSnap) => {
+          const issue = docSnap.data();
+          const penalty = calculatePenalty(issue.returnDate);
+          
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${issue.bookTitle}</td>
+            <td>${issue.memberName}</td>
+            <td>${issue.memberEmail || "N/A"}</td>
+            <td>${formatDate(issue.issueDate)}</td>
+            <td>${formatDate(issue.returnDate)}</td>
+            <td>
+              ${issue.returned ? 
+                '<span class="badge badge-pill badge-returned">Returned</span>' : 
+                penalty.days > 0 ? 
+                  `<span class="badge badge-pill badge-penalty">Overdue: Ksh ${penalty.amount}</span>` :
+                  '<span class="badge badge-info">Issued</span>'
+              }
+            </td>
+            <td>
+              ${!issue.returned ? 
+                `<button class="btn btn-warning btn-sm btn-return" data-id="${docSnap.id}" data-bookid="${issue.bookId}">
+                  <i class="fas fa-undo-alt"></i> Return
+                </button>` : 
+                '<span class="text-muted">Already returned</span>'
+              }
+            </td>
+          `;
+          issuesList.appendChild(row);
+        });
+        
+        // Add event listeners to return buttons
+        document.querySelectorAll('.btn-return').forEach(button => {
+          button.addEventListener('click', function() {
+            const issueId = this.getAttribute('data-id');
+            const bookId = this.getAttribute('data-bookid');
+            showReturnModal(issueId, bookId);
+          });
+        });
+        
+      } catch (error) {
+        console.error("Error loading issues: ", error);
+        showToast("Error loading issued books", "danger");
+      }
+    }
+
+    // Show return confirmation modal
+    async function showReturnModal(issueId, bookId) {
+      try {
+        // Get issue details
+        const issuesSnap = await getDocs(issuesCol);
+        let issueData;
+        
+        issuesSnap.forEach((docSnap) => { 
+          if (docSnap.id === issueId) {
+            issueData = docSnap.data();
+            issueData.id = docSnap.id;
+          }
+        });
+        
+        if (!issueData) {
+          showToast("Issue record not found", "danger");
+          return;
+        }
+        
+        // Calculate penalty if any
+        const penalty = calculatePenalty(issueData.returnDate);
+        let penaltyText = '';
+        
+        if (penalty.days > 0) {
+          penaltyText = `<div class="mt-2 text-danger">
+            <i class="fas fa-exclamation-triangle"></i> Overdue by ${penalty.days} days (Penalty: Ksh ${penalty.amount})
+          </div>`;
+        }
+        
+        // Set modal content
+        document.getElementById('returnDetails').innerHTML = `
+          <div><strong>Book:</strong> ${issueData.bookTitle}</div>
+          <div><strong>Member:</strong> ${issueData.memberName}</div>
+          <div><strong>Due Date:</strong> ${formatDate(issueData.returnDate)}</div>
+          ${penaltyText}
+        `;
+        
+        // Set confirm button action
+        const confirmBtn = document.getElementById('confirmReturn');
+        confirmBtn.onclick = () => returnBook(issueId, bookId);
+        
+        // Show modal
+        $('#returnModal').modal('show');
+        
+      } catch (error) {
+        console.error("Error showing return modal: ", error);
+        showToast("Error processing return", "danger");
+      }
+    }
+
+    // Return book
+    async function returnBook(issueId, bookId) {
+      try {
+        // Close modal
+        $('#returnModal').modal('hide');
+        
+        // Show loading in the button
+        const returnButton = document.querySelector(`.btn-return[data-id="${issueId}"]`);
+        const originalHtml = returnButton.innerHTML;
+        returnButton.innerHTML = '<span class="loader me-1"></span> Processing...';
+        returnButton.disabled = true;
+        
+        // Get book data
+        let bookData;
+        const booksSnap = await getDocs(booksCol);
+        booksSnap.forEach((docSnap) => { if (docSnap.id === bookId) bookData = docSnap.data(); });
+        
+        if (!bookData) {
+          showToast("Book data not found", "danger");
+          return;
+        }
+        
+        // Update book available copies
+        await updateDoc(doc(db, "books", bookId), { 
+          availableCopies: bookData.availableCopies + 1 
+        });
+        
+        // Mark issue as returned instead of deleting
+        await updateDoc(doc(db, "issues", issueId), {
+          returned: true,
+          returnedDate: new Date().toISOString().split('T')[0]
+        });
+        
+        showToast("Book returned successfully!", "success");
+        
+        // Refresh data
+        loadBooksDropdown();
+        loadIssues();
+        
+      } catch (error) {
+        console.error("Error returning book: ", error);
+        showToast("Error returning book", "danger");
+      }
+    }
+
+    // Refresh issues list
+    refreshIssues.addEventListener('click', function() {
+      this.classList.add('rotating');
+      loadIssues();
+      
+      setTimeout(() => {
+        this.classList.remove('rotating');
+      }, 1000);
+    });
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      loadBooksDropdown();
+      loadMembersDropdown();
+      loadIssues();
+      
+      // Set up real-time listener for issues
+      onSnapshot(issuesCol, (snapshot) => {
+        loadIssues();
+      });
+    });
+
+  </script>
+</body>
+</html>

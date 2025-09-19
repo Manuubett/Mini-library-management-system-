@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarenChebet Library | Admin Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #dc3545;
+      --primary-light: #f8d7da;
+      --secondary: #6c757d;
+      --light: #f8f9fa;
+      --dark: #343a40;
+      --success: #28a745;
+      --border-radius: 8px;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+      display: flex;
+      min-height: 100vh;
+    }
+    
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 250px;
+      background: var(--dark);
+      color: white;
+      padding: 20px 0;
+      transition: var(--transition);
+      box-shadow: var(--shadow);
+      z-index: 1000;
+    }
+    
+    .sidebar-header {
+      padding: 0 20px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 20px;
+    }
+    
+    .sidebar-header h2 {
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .sidebar-header h2 i {
+      color: var(--primary);
+    }
+    
+    .nav-links {
+      list-style: none;
+    }
+    
+    .nav-links li {
+      margin-bottom: 5px;
+    }
+    
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: #ddd;
+      padding: 12px 20px;
+      text-decoration: none;
+      transition: var(--transition);
+      font-weight: 500;
+    }
+    
+    .nav-links a:hover, .nav-links a.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-left: 4px solid var(--primary);
+    }
+    
+    .nav-links a i {
+      width: 20px;
+      text-align: center;
+    }
+    
+    .nav-links .logout {
+      margin-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 20px;
+    }
+    
+    .nav-links .logout a {
+      color: var(--primary-light);
+    }
+    
+    .nav-links .logout a:hover {
+      color: white;
+    }
+    
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .page-header h1 {
+      font-size: 1.8rem;
+      color: var(--dark);
+    }
+    
+    .welcome-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--primary-light);
+      color: var(--dark);
+      padding: 10px 15px;
+      border-radius: var(--border-radius);
+    }
+    
+    .welcome-box i {
+      color: var(--primary);
+      font-size: 1.2rem;
+    }
+    
+    /* Dashboard Cards */
+    .dashboard-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .card {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 25px;
+      transition: var(--transition);
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-card {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    
+    .stat-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    
+    .members-icon {
+      background: #e8f5e9;
+      color: #4caf50;
+    }
+    
+    .books-icon {
+      background: #e3f2fd;
+      color: #2196f3;
+    }
+    
+    .issues-icon {
+      background: #ffebee;
+      color: #f44336;
+    }
+    
+    .stat-info h3 {
+      font-size: 2rem;
+      margin-bottom: 5px;
+      color: var(--dark);
+    }
+    
+    .stat-info p {
+      color: var(--secondary);
+      font-weight: 500;
+    }
+    
+    /* Summary Section */
+    .summary-section {
+      margin-top: 20px;
+    }
+    
+    .summary-section h2 {
+      margin-bottom: 20px;
+      color: var(--dark);
+      font-size: 1.5rem;
+    }
+    
+    .summary-list {
+      list-style: none;
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    
+    .summary-list li {
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .summary-list li:last-child {
+      border-bottom: none;
+    }
+    
+    .summary-list li span {
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 992px) {
+      body {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+        padding: 10px 0;
+      }
+      
+      .nav-links {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 10px;
+      }
+      
+      .nav-links li {
+        margin-bottom: 0;
+        flex-shrink: 0;
+      }
+      
+      .nav-links a {
+        padding: 10px 15px;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+      }
+      
+      .nav-links a:hover, .nav-links a.active {
+        border-left: none;
+        border-bottom: 3px solid var(--primary);
+      }
+      
+      .nav-links .logout {
+        margin-top: 0;
+        border-top: none;
+        padding-top: 0;
+        border-left: 1px solid rgba(255, 255, 255, 0.1);
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .dashboard-cards {
+        grid-template-columns: 1fr;
+      }
+      
+      .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2><i class="fas fa-book"></i> CarenChebet Library</h2>
+    </div>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="lib registration.html"><i class="fas fa-users"></i> Manage Members</a></li>
+      <li><a href="add book.html"><i class="fas fa-book-open"></i> Manage Books</a></li>
+      <li><a href="issue 1.html"><i class="fas fa-exchange-alt"></i> Issues</a></li>
+      <li><a href="lib report.html"><i class="fas fa-chart-bar"></i> Reports</a></li>
+      <li class="logout"><a href="auth.html"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Admin Dashboard</h1>
+      <div class="welcome-box">
+        <i class="fas fa-crown"></i>
+        <span>Welcome Admin</span>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="dashboard-cards">
+      <div class="card stat-card">
+        <div class="stat-icon members-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-info">
+          <h3 id="members-count">0</h3>
+          <p>Total Members</p>
+        </div>
+      </div>
+
+      <div class="card stat-card">
+        <div class="stat-icon books-icon">
+          <i class="fas fa-book"></i>
+        </div>
+        <div class="stat-info">
+          <h3 id="books-count">0</h3>
+          <p>Total Books</p>
+        </div>
+      </div>
+
+      <div class="card stat-card">
+        <div class="stat-icon issues-icon">
+          <i class="fas fa-exchange-alt"></i>
+        </div>
+        <div class="stat-info">
+          <h3 id="issues-count">0</h3>
+          <p>Total Issues</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- System Summary -->
+    <div class="summary-section">
+      <h2>System Summary</h2>
+      <ul class="summary-list" id="summary">
+        <li>Loading system data... <span><i class="fas fa-spinner fa-spin"></i></span></li>
+      </ul>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAKMv1RIemwkvnBeIL7CriWiL0VprPipoI",
+      authDomain: "smart-f77b6.firebaseapp.com",
+      projectId: "smart-f77b6",
+      storageBucket: "smart-f77b6.appspot.com",
+      messagingSenderId: "210530046379",
+      appId: "1:210530046379:web:b2ecca8adc946581f842ee",
+      measurementId: "G-Y42CQGSQ5S"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const summaryList = document.getElementById("summary");
+    const membersCount = document.getElementById("members-count");
+    const booksCount = document.getElementById("books-count");
+    const issuesCount = document.getElementById("issues-count");
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "auth.html";
+      } else {
+        try {
+          let members = await getDocs(collection(db, "members"));
+          let books = await getDocs(collection(db, "books"));
+          let issues = await getDocs(collection(db, "issues"));
+
+          // Update the stat cards
+          membersCount.textContent = members.size;
+          booksCount.textContent = books.size;
+          issuesCount.textContent = issues.size;
+
+          // Update the summary list
+          summaryList.innerHTML = `
+            <li>Total Members: <span>${members.size}</span></li>
+            <li>Total Books: <span>${books.size}</span></li>
+            <li>Total Issues: <span>${issues.size}</span></li>
+            <li>Available Books: <span>${books.size - issues.size}</span></li>
+          `;
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          summaryList.innerHTML = `<li>Error loading data. Please try again later.</li>`;
+        }
+      }
+    });
+  </script>
+</body>
+</html>

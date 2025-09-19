@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarenChebet Library | Staff</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #f4f6f8; }
+    header { background: #28a745; color: #fff; padding: 15px; text-align: center; }
+    nav { background: #eaeaea; padding: 10px; display: flex; justify-content: space-around; }
+    nav a { text-decoration: none; color: #28a745; font-weight: bold; }
+    main { padding: 20px; }
+    .card { background: #fff; padding: 20px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>Welcome Staff 👩‍💼</h2>
+  </header>
+
+  <nav>
+    <a href="public.html">Home</a>
+      <a href="lib report.html">Reports</a>
+    <a href="issue 1.html">Issue/Return</a>
+    <a href="auth.html">Logout</a>
+  </nav>
+
+  <main>
+    <div class="card">
+      <h3>Pending Returns</h3>
+      <ul id="pendingReturns">Loading...</ul>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-auth.js";
+    import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.11.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAKMv1RIemwkvnBeIL7CriWiL0VprPipoI",
+      authDomain: "smart-f77b6.firebaseapp.com",
+      projectId: "smart-f77b6",
+      storageBucket: "smart-f77b6.appspot.com",
+      messagingSenderId: "210530046379",
+      appId: "1:210530046379:web:b2ecca8adc946581f842ee",
+      measurementId: "G-Y42CQGSQ5S"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const pendingList = document.getElementById("pendingReturns");
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) window.location.href = "auth.html";
+      else {
+        const q = query(collection(db, "issues"), where("status", "==", "Issued"));
+        const snapshot = await getDocs(q);
+        pendingList.innerHTML = "";
+        snapshot.forEach(doc => {
+          let d = doc.data();
+          pendingList.innerHTML += `<li>${d.bookTitle} → ${d.memberName} (Due: ${d.dueDate})</li>`;
+        });
+        if (pendingList.innerHTML === "") pendingList.innerHTML = "<li>No pending returns</li>";
+      }
+    });
+  </script>
+</body>
+</html>
